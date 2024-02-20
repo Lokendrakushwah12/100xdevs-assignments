@@ -45,5 +45,59 @@
   const app = express();
   
   app.use(bodyParser.json());
+
+  let todos = [];
+
+  app.get('/todos', (req, res)=>{
+    res.status(200).json(todos);
+  })
+
+  app.get('/todos/:id', (req, res)=>{
+    let todo = todos.find((todo)=>{return todo.id === parseInt(req.params.id)});
+    if(todo){
+      res.status(200).json(todo);
+    }
+    else{
+      res.status(404).send('404 Not Found');
+    }
+  })
+
+  app.post('/todos', (req, res)=>{
+    const newTodo = {
+      id: Math.floor(Math.random() * 1000000),
+      title: req.body.title,
+      description: req.body.description
+    }
+    todos.push(newTodo);
+    res.status(201).json(newTodo);
+  })
+
+  app.put('/todos/:id', (req, res)=>{
+    let todo = todos.find((todo)=>{return todo.id === parseInt(req.params.id)});
+    if(todo){
+      todo.title = req.body.title;
+      todo.description = req.body.description;
+      res.status(200).json(todo);
+    }
+    else{
+      res.status(404).send('404 Not Found');
+    }
+  })
   
+  app.delete('/todos/:id', (req, res)=>{
+    let todo = todos.find((todo)=>{return todo.id === parseInt(req.params.id)});
+    if(todo){
+      todos = todos.filter((todo)=>{return todo.id !== parseInt(req.params.id)});
+      res.status(200).send('200 OK');
+    }
+    else{
+      res.status(404).send('404 Not Found');
+    }
+  })
+
+  app.use((req, res)=>{
+    res.status(404).send('404 Not Found');
+  })
+
+
   module.exports = app;
